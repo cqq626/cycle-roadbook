@@ -11,10 +11,13 @@ export function Map() {
   const setStartPoint = (latlng: LatLngI) => {
     setWayPoints([latlng]);
   };
+  const clearMap = () => {
+    setWayPoints([]);
+  };
 
   const [menuItems, setMenuItems] = useState<MenuItemPropsI[]>([
     { text: '新建起点', callback: setStartPoint },
-    { text: '清除地图', callback: console.log },
+    { text: '清除地图', callback: clearMap },
   ]);
 
   return (
