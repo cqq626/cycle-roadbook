@@ -4,6 +4,7 @@ import {
   useEffect,
   CSSProperties,
   useState,
+  useCallback,
 } from 'react';
 
 export interface LatLngI {
@@ -31,26 +32,23 @@ export const MapContext = createContext<MapContextPropsI>({
 export const Map = (props: MapPropsI) => {
   console.log(`[trigger]Map`);
   const { style, children, center, zoom } = props;
-
   const domRef = useRef(null);
 
-  // FIXME: 这里mapRef和contextState功能有些重
-  // 只用mapRef的话,后续menu无法监听到mapRef的赋值进行初始化
-  // 只用contextState时,useEffect里会执行多次
-  const mapRef = useRef(null);
+  // FIXME: 这里如果不用state用ref的话,Menu监听不到Map的初始化,能不用state么
   const [contextState, setContextState] = useState({ map: null, BMapGL: null });
+  const initOrModifyMap = useCallback(() => {
+    const BMapGL = (window as any).BMapGL;
+    let map: any = contextState.map;
+    if (!map) {
+      map = new BMapGL.Map(domRef.current);
+      setContextState({ map, BMapGL });
+    }
+    map.centerAndZoom(new BMapGL.Point(center.lng, center.lat), zoom);
+  }, [contextState, center, zoom]);
 
   useEffect(() => {
-    const BMapGL = (window as any).BMapGL;
-
-    if (!mapRef.current) {
-      mapRef.current = new BMapGL.Map(domRef.current);
-      setContextState({ map: mapRef.current, BMapGL });
-    }
-    (mapRef.current as any).centerAndZoom(
-      new BMapGL.Point(center.lng, center.lat),
-      zoom
-    );
+    console.log(`[useEffect]Map`);
+    initOrModifyMap();
   }, [center, zoom]);
 
   return (

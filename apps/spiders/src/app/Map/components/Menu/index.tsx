@@ -1,4 +1,11 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react';
 import { MapContext } from '../Map';
 
 export interface MenuPropsI {
@@ -16,33 +23,36 @@ export const Menu = (props: MenuPropsI) => {
   const { children } = props;
   const mapContext = useContext(MapContext);
 
-  const menuRef = useRef<any>(null);
   const [contextState, setContextState] = useState({ menu: null });
 
-  useEffect(() => {
+  const initMenu = useCallback(() => {
     const { map, BMapGL } = mapContext;
-
     if (map === null) {
       return;
     }
-    if (menuRef.current !== null) {
+    let menu: any = contextState.menu;
+    if (!menu) {
+      menu = new BMapGL.ContextMenu();
+      map.addContextMenu(menu);
+      setContextState({ menu });
+    }
+  }, [mapContext, contextState]);
+
+  const removeMenu = useCallback(() => {
+    const { map } = mapContext;
+    if (map === null) {
       return;
     }
+    const menu: any = contextState.menu;
+    if (menu !== null) {
+      map.removeContextMenu(menu);
+    }
+  }, [mapContext, contextState]);
 
-    const menu = new BMapGL.ContextMenu();
-    map.addContextMenu(menu);
-    setContextState({ menu });
-    menuRef.current = menu;
-
-    return () => {
-      console.log(`[release]Menu`);
-      if (map === null) {
-        return;
-      }
-      if (menuRef.current !== null) {
-        map.removeContextMenu(menuRef.current);
-      }
-    };
+  useEffect(() => {
+    console.log(`[useEffect]Menu`);
+    initMenu();
+    return removeMenu;
   }, [mapContext]);
 
   return (

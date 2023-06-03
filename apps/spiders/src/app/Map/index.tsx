@@ -5,9 +5,10 @@ import { Map as MapInner } from './components/Map';
 import { Menu, MenuItem, MenuItemPropsI } from './components/Menu';
 
 export function Map() {
+  console.log(`[trigger]MapWrapper`);
   const [menuItems, setMenuItems] = useState<MenuItemPropsI[]>([
     { text: '新建起点', callback: console.log },
-    // { text: '清除地图', callback: console.log },
+    { text: '清除地图', callback: console.log },
   ]);
 
   return (
