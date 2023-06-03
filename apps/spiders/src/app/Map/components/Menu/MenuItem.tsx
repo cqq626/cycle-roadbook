@@ -9,29 +9,37 @@ export interface MenuItemPropsI {
 
 export const MenuItem = ({ text, callback }: MenuItemPropsI) => {
   console.log(`[trigger]MenuItem`);
-  const menuItemRef = useRef(null);
+  const compRef = useRef(null);
   const { BMapGL } = useContext(MapContext);
   const { menu } = useContext(MenuContext);
 
-  useEffect(() => {
+  const initOrModify = () => {
+    console.log(`[initOrModify]MenuItem`);
     if (menu === null) {
       return;
     }
-    if (menuItemRef.current !== null) {
-      console.log(`[reset]MenuItem`);
-      menu.removeItem(menuItemRef.current);
+    let comp = compRef.current;
+    if (comp !== null) {
+      menu.removeItem(comp);
     }
-    menuItemRef.current = new BMapGL.MenuItem(text, callback);
-    menu.addItem(menuItemRef.current);
-    return () => {
-      console.log(`[release]MenuItem`);
-      if (menu === null) {
-        return;
-      }
-      if (menuItemRef.current !== null) {
-        menu.removeItem(menuItemRef.current);
-      }
-    };
+    comp = new BMapGL.MenuItem(text, callback);
+    menu.addItem(comp);
+    compRef.current = comp;
+  };
+
+  const remove = () => {
+    console.log(`[remove]MenuItem`);
+    if (menu === null) {
+      return;
+    }
+    if (compRef.current !== null) {
+      menu.removeItem(compRef.current);
+    }
+  };
+
+  useEffect(() => {
+    initOrModify();
+    return remove;
   }, [menu, text, callback]);
 
   return null;

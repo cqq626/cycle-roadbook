@@ -4,7 +4,6 @@ import {
   useEffect,
   CSSProperties,
   useState,
-  useCallback,
 } from 'react';
 
 export interface LatLngI {
@@ -36,7 +35,9 @@ export const Map = (props: MapPropsI) => {
 
   // FIXME: 这里如果不用state用ref的话,Menu监听不到Map的初始化,能不用state么
   const [contextState, setContextState] = useState({ map: null, BMapGL: null });
-  const initOrModifyMap = useCallback(() => {
+
+  const initOrModifyMap = () => {
+    console.log(`[initOrModify]Map`);
     const BMapGL = (window as any).BMapGL;
     let map: any = contextState.map;
     if (!map) {
@@ -44,11 +45,15 @@ export const Map = (props: MapPropsI) => {
       setContextState({ map, BMapGL });
     }
     map.centerAndZoom(new BMapGL.Point(center.lng, center.lat), zoom);
-  }, [contextState, center, zoom]);
+  };
+
+  const remove = () => {
+    console.log(`[remove]Map`);
+  };
 
   useEffect(() => {
-    console.log(`[useEffect]Map`);
     initOrModifyMap();
+    return remove;
   }, [center, zoom]);
 
   return (

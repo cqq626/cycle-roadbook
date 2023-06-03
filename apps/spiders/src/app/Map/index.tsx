@@ -1,13 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 
-import { Map as MapInner } from './components/Map';
+import { LatLngI, Map as MapInner } from './components/Map';
 import { Menu, MenuItem, MenuItemPropsI } from './components/Menu';
+import { Marker, MarkerPropsI } from './components/Marker';
 
 export function Map() {
   console.log(`[trigger]MapWrapper`);
+  const [wayPoints, setWayPoints] = useState<LatLngI[]>([]);
+  const setStartPoint = (latlng: LatLngI) => {
+    setWayPoints([latlng]);
+  };
+
   const [menuItems, setMenuItems] = useState<MenuItemPropsI[]>([
-    { text: '新建起点', callback: console.log },
+    { text: '新建起点', callback: setStartPoint },
     { text: '清除地图', callback: console.log },
   ]);
 
@@ -25,6 +31,9 @@ export function Map() {
           <MenuItem key={item.text} {...item} />
         ))}
       </Menu>
+      {wayPoints.map((wayPoint) => (
+        <Marker latlng={wayPoint} enableDragging={true} />
+      ))}
     </MapInner>
   );
 }
