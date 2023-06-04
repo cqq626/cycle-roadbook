@@ -19,6 +19,7 @@ interface WayPointI {
 
 export function Map() {
   console.log(`[trigger]MapWrapper`);
+  const [center, setCenter] = useState<LatLngI>({ lat: 39.915, lng: 116.404 });
   const [wayPoints, setWayPoints] = useState<WayPointI[]>([]);
   const setStartPoint = (latlng: LatLngI) => {
     setWayPoints([genWayPoint(latlng)]);
@@ -34,7 +35,7 @@ export function Map() {
 
   return (
     <MapInner
-      center={{ lat: 39.915, lng: 116.404 }}
+      center={center}
       zoom={15}
       style={{
         width: '600px',
