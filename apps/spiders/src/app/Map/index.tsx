@@ -2,20 +2,32 @@ import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 
 import { LatLngI, Map as MapInner } from './components/Map';
-import { Menu, MenuItem, MenuItemPropsI } from './components/Menu';
-import { Marker, MarkerPropsI } from './components/Marker';
+import { Menu, MenuItem, MenuItemOptionI } from './components/Menu';
+import { Marker } from './components/Marker';
+
+function genWayPoint(latlng: LatLngI): WayPointI {
+  return {
+    latlng,
+    pid: Math.random().toString(32).slice(2),
+  };
+}
+
+interface WayPointI {
+  latlng: LatLngI;
+  pid: string;
+}
 
 export function Map() {
   console.log(`[trigger]MapWrapper`);
-  const [wayPoints, setWayPoints] = useState<LatLngI[]>([]);
+  const [wayPoints, setWayPoints] = useState<WayPointI[]>([]);
   const setStartPoint = (latlng: LatLngI) => {
-    setWayPoints([latlng]);
+    setWayPoints([genWayPoint(latlng)]);
   };
   const clearMap = () => {
     setWayPoints([]);
   };
 
-  const [menuItems, setMenuItems] = useState<MenuItemPropsI[]>([
+  const [menuItems, setMenuItems] = useState<MenuItemOptionI[]>([
     { text: '新建起点', callback: setStartPoint },
     { text: '清除地图', callback: clearMap },
   ]);
@@ -34,8 +46,8 @@ export function Map() {
           <MenuItem key={item.text} {...item} />
         ))}
       </Menu>
-      {wayPoints.map((wayPoint) => (
-        <Marker latlng={wayPoint} enableDragging={true} />
+      {wayPoints.map(({ latlng, pid }) => (
+        <Marker key={pid} latlng={latlng} enableDragging={true} />
       ))}
     </MapInner>
   );

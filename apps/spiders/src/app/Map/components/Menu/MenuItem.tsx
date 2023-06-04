@@ -2,10 +2,11 @@ import { useContext, useRef, useEffect } from 'react';
 import { MapContext, LatLngI } from '../Map';
 import { MenuContext } from './index';
 
-export interface MenuItemPropsI {
+export interface MenuItemOptionI {
   text: string;
   callback: (latlng: LatLngI) => void;
 }
+type MenuItemPropsI = MenuItemOptionI;
 
 export const MenuItem = ({ text, callback }: MenuItemPropsI) => {
   console.log(`[trigger]MenuItem`);
@@ -13,11 +14,12 @@ export const MenuItem = ({ text, callback }: MenuItemPropsI) => {
   const { BMapGL } = useContext(MapContext);
   const { menu } = useContext(MenuContext);
 
-  const initOrModify = () => {
-    console.log(`[initOrModify]MenuItem`);
+  useEffect(() => {
+    console.log(`[MenuItem]useEffect`);
     if (menu === null) {
       return;
     }
+
     let comp = compRef.current;
     if (comp !== null) {
       menu.removeItem(comp);
@@ -25,22 +27,15 @@ export const MenuItem = ({ text, callback }: MenuItemPropsI) => {
     comp = new BMapGL.MenuItem(text, callback);
     menu.addItem(comp);
     compRef.current = comp;
-  };
 
-  const remove = () => {
-    console.log(`[remove]MenuItem`);
-    if (menu === null) {
-      return;
-    }
-    if (compRef.current !== null) {
-      menu.removeItem(compRef.current);
-    }
-  };
-
-  useEffect(() => {
-    initOrModify();
-    return remove;
-  }, [menu, text, callback]);
+    return () => {
+      console.log(`[MenuItem]useEffect clear`);
+      if (compRef.current) {
+        menu.removeItem(compRef.current);
+        compRef.current = null;
+      }
+    };
+  }, [BMapGL, menu, text, callback]);
 
   return null;
 };

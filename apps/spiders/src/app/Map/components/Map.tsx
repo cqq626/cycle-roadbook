@@ -11,19 +11,19 @@ export interface LatLngI {
   lng: number;
 }
 
-export interface MapPropsI {
+interface MapPropsI {
   center: LatLngI;
   zoom: number;
   children?: any;
   style?: CSSProperties;
 }
 
-export interface MapContextPropsI {
+interface ContextI {
   map: any | null;
   BMapGL: any | null;
 }
 
-export const MapContext = createContext<MapContextPropsI>({
+export const MapContext = createContext<ContextI>({
   map: null,
   BMapGL: null,
 });
@@ -33,27 +33,27 @@ export const Map = (props: MapPropsI) => {
   const { style, children, center, zoom } = props;
   const domRef = useRef(null);
 
+  const compRef = useRef<any | null>(null);
   // FIXME: 这里如果不用state用ref的话,Menu监听不到Map的初始化,能不用state么
-  const [contextState, setContextState] = useState({ map: null, BMapGL: null });
+  const [contextState, setContextState] = useState<ContextI>({
+    map: null,
+    BMapGL: null,
+  });
 
-  const initOrModifyMap = () => {
-    console.log(`[initOrModify]Map`);
+  useEffect(() => {
+    console.log(`[Map]useEffect`);
     const BMapGL = (window as any).BMapGL;
-    let map: any = contextState.map;
+    let map: any = compRef.current;
     if (!map) {
       map = new BMapGL.Map(domRef.current);
+      compRef.current = map;
       setContextState({ map, BMapGL });
     }
     map.centerAndZoom(new BMapGL.Point(center.lng, center.lat), zoom);
-  };
 
-  const remove = () => {
-    console.log(`[remove]Map`);
-  };
-
-  useEffect(() => {
-    initOrModifyMap();
-    return remove;
+    return () => {
+      console.log(`[Map]useEffect clear`);
+    };
   }, [center, zoom]);
 
   return (
