@@ -1,29 +1,22 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { MapContext, LatLngI } from '../Map';
+import { useContext, useEffect, useRef, ReactNode, useState } from 'react';
+import { MapContext, LatLngI } from './Map';
 
 interface MarkerPropsI {
   latlng: LatLngI;
   enableDragging: boolean;
-  children?: any;
+  popupComp?: ReactNode;
 }
-
-interface ContextI {
-  marker: any | null;
-}
-export const MarkerContext = createContext<ContextI>({
-  marker: null,
-});
 
 export const Marker = ({
   latlng,
   enableDragging = false,
-  children,
+  popupComp,
 }: MarkerPropsI) => {
   console.log(`[Marker]trigger`);
   const { map, BMapGL } = useContext(MapContext);
 
   const compRef = useRef<any | null>(null);
-  const [contextState, setContextState] = useState<ContextI>({ marker: null });
+  const popupDomRef = useRef<any | null>(null);
 
   useEffect(() => {
     console.log(`[Marker]useEffect`);
@@ -36,7 +29,6 @@ export const Marker = ({
       marker = new BMapGL.Marker(point, { enableDragging });
       map.addOverlay(marker);
       compRef.current = marker;
-      setContextState({ marker });
     } else {
       marker.setPosition(point);
       if (enableDragging) {
@@ -46,18 +38,25 @@ export const Marker = ({
       }
     }
 
+    const popup = new BMapGL.InfoWindow(popupDomRef.current, {
+      offset: new BMapGL.Size(0, -25),
+      width: 0,
+      height: 0,
+    });
+    const markerCb = () => {
+      map.openInfoWindow(popup, point);
+    };
+    marker.addEventListener('click', markerCb);
+
     return () => {
       console.log(`[Marker]useEffect clear`);
       if (compRef.current) {
         map.removeOverlay(compRef.current);
+        compRef.current.removeEventListener('click', markerCb);
         compRef.current = null;
       }
     };
-  }, [map, BMapGL, latlng, enableDragging]);
+  }, [map, BMapGL, latlng, enableDragging, popupComp]);
 
-  return (
-    <MarkerContext.Provider value={contextState}>
-      {children}
-    </MarkerContext.Provider>
-  );
+  return <div ref={popupDomRef}>{popupComp}</div>;
 };

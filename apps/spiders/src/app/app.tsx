@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import 'antd/dist/reset.css';
 
 import { Map } from './Map';
 

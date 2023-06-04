@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
+import { Button } from 'antd';
 
 import { LatLngI, Map as MapInner } from './components/Map';
 import { Menu, MenuItem, MenuItemOptionI } from './components/Menu';
@@ -48,7 +49,16 @@ export function Map() {
         ))}
       </Menu>
       {wayPoints.map(({ latlng, pid }) => (
-        <Marker key={pid} latlng={latlng} enableDragging={true} />
+        <Marker
+          key={pid}
+          latlng={latlng}
+          enableDragging={true}
+          popupComp={
+            <div>
+              fuck it <Button>lalal</Button>
+            </div>
+          }
+        />
       ))}
     </MapInner>
   );
