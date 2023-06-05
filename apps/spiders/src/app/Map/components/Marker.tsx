@@ -58,5 +58,9 @@ export const Marker = ({
     };
   }, [map, BMapGL, latlng, enableDragging, popupComp]);
 
-  return <div ref={popupDomRef}>{popupComp}</div>;
+  return (
+    <div style={{ display: 'none' }}>
+      <div ref={popupDomRef}>{popupComp}</div>
+    </div>
+  );
 };

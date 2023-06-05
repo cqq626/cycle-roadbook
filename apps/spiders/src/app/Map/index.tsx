@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { Button } from 'antd';
 
-import { LatLngI, Map as MapInner } from './components/Map';
+import { LatLngI, Map as MapInner, MapHandleI } from './components/Map';
 import { Menu, MenuItem, MenuItemOptionI } from './components/Menu';
 import { Marker } from './components/Marker';
+import { PolyLine } from './components/PolyLine';
 
 function genWayPoint(latlng: LatLngI): WayPointI {
   return {
@@ -25,17 +26,36 @@ interface WayPointI {
   pid: string;
 }
 
+interface RouteSegI {
+  latlngs: LatLngI[];
+  dis: number;
+}
+
 interface MenuItemI {
   mid: string;
   option: MenuItemOptionI;
+}
+
+function genRouteInfo(routeSegs: RouteSegI[]) {
+  let routePoints: LatLngI[] = [];
+  let routeDis = 0;
+  for (const { dis, latlngs } of routeSegs) {
+    routeDis += dis;
+    routePoints = routePoints.concat(latlngs);
+  }
+  return { routeDis, routePoints };
 }
 
 export function Map() {
   console.log(`[trigger]MapWrapper`);
   const [center, setCenter] = useState<LatLngI>({ lat: 39.915, lng: 116.404 });
   const [wayPoints, setWayPoints] = useState<WayPointI[]>([]);
+  const [routePoints, setRoutePoints] = useState<LatLngI[]>([]);
+
   // FIXME:让callback回调里能拿到最新的wayPoints,而不是频繁的setMenuItems
   const wayPointsRef = useRef<WayPointI[]>([]);
+  const routeSegsRef = useRef<RouteSegI[]>([]);
+  const mapCompRef = useRef<MapHandleI>(null);
 
   const setStartPoint = (latlng: LatLngI) => {
     const newWayPoints = [genWayPoint(latlng)];
@@ -49,11 +69,26 @@ export function Map() {
       ].map(genMenuItem)
     );
   };
-  const addMidPoint = (latlng: LatLngI) => {
+  const addMidPoint = async (latlng: LatLngI) => {
     const midPoint = genWayPoint(latlng);
-    const newWayPoints = [...wayPointsRef.current, midPoint];
+    const curWayPoints = wayPointsRef.current;
+    const lastPoint = curWayPoints[curWayPoints.length - 1];
+    const newWayPoints = [...curWayPoints, midPoint];
     setWayPoints(newWayPoints);
     wayPointsRef.current = newWayPoints;
+
+    const mapComp = mapCompRef.current;
+    if (mapComp) {
+      const routeSeg = await mapComp.getRoute(
+        lastPoint.latlng,
+        midPoint.latlng
+      );
+      const newRouteSegs = [...routeSegsRef.current, routeSeg];
+      routeSegsRef.current = newRouteSegs;
+
+      const routeInfo = genRouteInfo(newRouteSegs);
+      setRoutePoints(routeInfo.routePoints);
+    }
   };
   const clearMap = () => {
     setWayPoints([]);
@@ -69,6 +104,7 @@ export function Map() {
 
   return (
     <MapInner
+      ref={mapCompRef}
       center={center}
       zoom={15}
       style={{
@@ -93,6 +129,7 @@ export function Map() {
           }
         />
       ))}
+      {routePoints.length > 0 && <PolyLine latlngs={routePoints} />}
     </MapInner>
   );
 }
