@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-  cacheDir: '../../node_modules/.vite/spiders',
+  cacheDir: '../../node_modules/.vite/roadbook',
 
   server: {
     port: 4200,

@@ -1,7 +1,7 @@
 {
-  "name": "spiders",
+  "name": "roadbook",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/spiders/src",
+  "sourceRoot": "apps/roadbook/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -9,7 +9,7 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/spiders"
+        "outputPath": "dist/apps/roadbook"
       },
       "configurations": {
         "development": {
@@ -24,15 +24,15 @@
       "executor": "@nx/vite:dev-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "spiders:build"
+        "buildTarget": "roadbook:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "spiders:build:development",
+          "buildTarget": "roadbook:build:development",
           "hmr": true
         },
         "production": {
-          "buildTarget": "spiders:build:production",
+          "buildTarget": "roadbook:build:production",
           "hmr": false
         }
       }
@@ -41,36 +41,36 @@
       "executor": "@nx/vite:preview-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "spiders:build"
+        "buildTarget": "roadbook:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "spiders:build:development"
+          "buildTarget": "roadbook:build:development"
         },
         "production": {
-          "buildTarget": "spiders:build:production"
+          "buildTarget": "roadbook:build:production"
         }
       }
     },
     "test": {
       "executor": "@nx/vite:test",
-      "outputs": ["coverage/apps/spiders"],
+      "outputs": ["coverage/apps/roadbook"],
       "options": {
         "passWithNoTests": true,
-        "reportsDirectory": "../../coverage/apps/spiders"
+        "reportsDirectory": "../../coverage/apps/roadbook"
       }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/spiders/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["apps/roadbook/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "serve-static": {
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "spiders:build"
+        "buildTarget": "roadbook:build"
       }
     }
   },

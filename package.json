@@ -1,9 +1,9 @@
 {
-  "name": "@streetview-spiders/source",
+  "name": "@cycle-roadbooks/source",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "nx serve spiders"
+    "start": "nx serve roadbook"
   },
   "private": true,
   "dependencies": {

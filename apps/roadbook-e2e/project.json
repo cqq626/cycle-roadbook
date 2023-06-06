@@ -1,22 +1,22 @@
 {
-  "name": "spiders-e2e",
+  "name": "roadbook-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/spiders-e2e/src",
+  "sourceRoot": "apps/roadbook-e2e/src",
   "projectType": "application",
   "targets": {
     "e2e": {
       "executor": "@nx/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/spiders-e2e/cypress.config.ts",
-        "devServerTarget": "spiders:serve:development",
+        "cypressConfig": "apps/roadbook-e2e/cypress.config.ts",
+        "devServerTarget": "roadbook:serve:development",
         "testingType": "e2e"
       },
       "configurations": {
         "production": {
-          "devServerTarget": "spiders:serve:production"
+          "devServerTarget": "roadbook:serve:production"
         },
         "ci": {
-          "devServerTarget": "spiders:serve-static"
+          "devServerTarget": "roadbook:serve-static"
         }
       }
     },
@@ -24,10 +24,10 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/spiders-e2e/**/*.{js,ts}"]
+        "lintFilePatterns": ["apps/roadbook-e2e/**/*.{js,ts}"]
       }
     }
   },
   "tags": [],
-  "implicitDependencies": ["spiders"]
+  "implicitDependencies": ["roadbook"]
 }
