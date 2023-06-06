@@ -5,12 +5,14 @@ interface MarkerPropsI {
   latlng: LatLngI;
   enableDragging: boolean;
   popupComp?: ReactNode;
+  onChange?: (latlng: LatLngI) => void;
 }
 
 export const Marker = ({
   latlng,
   enableDragging = false,
   popupComp,
+  onChange,
 }: MarkerPropsI) => {
   console.log(`[Marker]trigger`);
   const { map, BMapGL } = useContext(MapContext);
@@ -46,13 +48,18 @@ export const Marker = ({
     const markerCb = () => {
       map.openInfoWindow(popup, point);
     };
+    const dragCb = (e: any) => {
+      onChange && onChange(e.latLng);
+    };
     marker.addEventListener('click', markerCb);
+    marker.addEventListener('dragend', dragCb);
 
     return () => {
       console.log(`[Marker]useEffect clear`);
       if (compRef.current) {
         map.removeOverlay(compRef.current);
         compRef.current.removeEventListener('click', markerCb);
+        compRef.current.removeEventListener('dragend', dragCb);
         compRef.current = null;
       }
     };
