@@ -180,6 +180,7 @@ export function Map() {
           ))}
         </Menu>
         {wayPoints.map(({ latlng, pid }, idx) => (
+          // FIXME: Marker will re render every time
           <Marker
             key={pid}
             latlng={latlng}
@@ -192,6 +193,7 @@ export function Map() {
               await addOrModifyRouteSegs(idx, idx + 1, true);
               await addOrModifyRouteSegs(idx - 1, idx, true);
             }}
+            label={idx === 0 ? '起点' : `途经点${idx}`}
             popupComp={
               <StyledMarkerPopup>
                 <StyledMarkerName
@@ -199,7 +201,7 @@ export function Map() {
                     console.log('fuck');
                   }}
                 >
-                  {idx === 0 ? '起点' : `途经点${idx + 1}`}
+                  {idx === 0 ? '起点' : `途经点${idx}`}
                 </StyledMarkerName>
                 <StyledMarkerButtons>
                   <Button

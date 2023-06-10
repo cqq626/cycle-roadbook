@@ -8,6 +8,7 @@ interface MarkerPropsI {
   enableDragging: boolean;
   popupComp?: ReactNode;
   onChange?: (latlng: LatLngI) => void;
+  label?: string;
 }
 
 export const Marker = ({
@@ -15,6 +16,7 @@ export const Marker = ({
   enableDragging = false,
   popupComp,
   onChange,
+  label,
 }: MarkerPropsI) => {
   console.log(`[Marker]trigger`);
   const { map, BMapGL } = useContext(MapContext);
@@ -61,12 +63,17 @@ export const Marker = ({
         popup.addEventListener('open', openPopupCb);
         popup.addEventListener('close', closePopupCb);
       }
+      marker.setLabel(new BMapGL.Label(label));
     } else {
       marker.setPosition(point);
       if (enableDragging) {
         marker.enableDragging();
       } else {
         marker.disableDragging();
+      }
+      const labelComp = marker.getLabel();
+      if (labelComp) {
+        labelComp.setContent(label);
       }
     }
 
@@ -85,7 +92,7 @@ export const Marker = ({
         popupDomRef.current = null;
       }
     };
-  }, [map, BMapGL, latlng, enableDragging, popupComp, onChange]);
+  }, [map, BMapGL, latlng, enableDragging, popupComp, onChange, label]);
 
   return (
     openPopup &&
