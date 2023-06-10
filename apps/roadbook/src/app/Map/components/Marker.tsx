@@ -85,7 +85,7 @@ export const Marker = ({
         popupDomRef.current = null;
       }
     };
-  }, [map, BMapGL, latlng, enableDragging, popupComp]);
+  }, [map, BMapGL, latlng, enableDragging, popupComp, onChange]);
 
   return (
     openPopup &&

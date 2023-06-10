@@ -48,8 +48,8 @@ function genRouteInfo(routeSegs: RouteSegI[]) {
 
 function genNewLatlng({ lat, lng }: LatLngI) {
   return {
-    lat: lat + 0.0005,
-    lng: lng + 0.0005,
+    lat: lat + 0.001,
+    lng: lng + 0.001,
   };
 }
 
@@ -81,14 +81,14 @@ export function Map() {
     } else {
       // 删除中间
       routeSegsRef.current.splice(delWayPointIdx - 1, 2);
-      return addOrModifyRouteSegs(delWayPointIdx - 1, 1);
+      return addOrModifyRouteSegs(delWayPointIdx - 1, delWayPointIdx);
     }
     const { routeDis, routePoints } = genRouteInfo(routeSegsRef.current);
     setRoutePoints(routePoints);
     setRouteDis(routeDis);
   };
 
-  // endWayPointIdx - 1 对应该 routeSeg 的 idx
+  // startWayPointIdx 对应该 routeSeg 的 idx
   const addOrModifyRouteSegs = async (
     startWayPointIdx: number,
     endWayPointIdx: number,
@@ -119,18 +119,7 @@ export function Map() {
     setRouteDis(routeDis);
   };
 
-  const setStartPoint = (latlng: LatLngI) => {
-    const newWayPoints = [genWayPoint(latlng)];
-    setWayPoints(newWayPoints);
-
-    setMenuItems(
-      [
-        { text: '创建途经点', callback: addMidPoint },
-        { text: '清除地图', callback: clearMap },
-      ].map(genMenuItem)
-    );
-  };
-  const addMidPoint = async (latlng: LatLngI, targetIdx?: number) => {
+  const addPoint = async (latlng: LatLngI, targetIdx?: number) => {
     const midPoint = genWayPoint(latlng);
     if (typeof targetIdx !== 'number') {
       // 菜单栏添加途经点
@@ -142,23 +131,19 @@ export function Map() {
     wayPointsRef.current.splice(targetIdx, 0, midPoint);
     const newWayPoints = wayPointsRef.current;
     setWayPoints(newWayPoints);
-    if (targetIdx + 1 === newWayPoints.length) {
-      // 插在尾部
-      if (targetIdx > 0) {
-        addOrModifyRouteSegs(targetIdx - 1, targetIdx);
-      }
-    } else if (targetIdx === 0) {
+    if (targetIdx === 0) {
       // 插在头部
-      if (newWayPoints.length > 1) {
-        addOrModifyRouteSegs(targetIdx, targetIdx + 1);
-      }
+      addOrModifyRouteSegs(targetIdx, targetIdx + 1);
+    } else if (targetIdx + 1 === newWayPoints.length) {
+      // 插在尾部
+      addOrModifyRouteSegs(targetIdx - 1, targetIdx);
     } else {
       // 插在中间
-      addOrModifyRouteSegs(targetIdx - 1, targetIdx);
+      addOrModifyRouteSegs(targetIdx - 1, targetIdx, true);
       addOrModifyRouteSegs(targetIdx, targetIdx + 1);
     }
   };
-  const delMidPoint = async (idx: number) => {
+  const delPoint = async (idx: number) => {
     wayPointsRef.current.splice(idx, 1);
     setWayPoints(wayPointsRef.current);
     deleteRouteSegs(idx);
@@ -169,17 +154,11 @@ export function Map() {
     routeSegsRef.current = [];
     setRoutePoints([]);
     setRouteDis(0);
-    setMenuItems(
-      [
-        { text: '新建起点', callback: setStartPoint },
-        { text: '清除地图', callback: clearMap },
-      ].map(genMenuItem)
-    );
   };
 
   const [menuItems, setMenuItems] = useState<MenuItemI[]>(
     [
-      { text: '新建起点', callback: setStartPoint },
+      { text: '创建途经点', callback: addPoint },
       { text: '清除地图', callback: clearMap },
     ].map(genMenuItem)
   );
@@ -225,19 +204,19 @@ export function Map() {
                 <StyledMarkerButtons>
                   <Button
                     onClick={() => {
-                      addMidPoint(latlng, idx);
+                      addPoint(latlng, idx);
                     }}
                   >
                     前+1
                   </Button>
                   <Button
                     onClick={() => {
-                      addMidPoint(latlng, idx + 1);
+                      addPoint(latlng, idx + 1);
                     }}
                   >
                     后+1
                   </Button>
-                  <Button danger onClick={() => delMidPoint(idx)}>
+                  <Button danger onClick={() => delPoint(idx)}>
                     删除
                   </Button>
                 </StyledMarkerButtons>
