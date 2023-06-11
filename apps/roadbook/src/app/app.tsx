@@ -4,7 +4,8 @@ import 'antd/dist/reset.css';
 import { Map } from './Map';
 
 const StyledApp = styled.div`
-  // Your style here
+  width: 100%;
+  height: 100%;
 `;
 
 export function App() {

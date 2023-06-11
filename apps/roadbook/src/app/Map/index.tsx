@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
-import { Button, Input } from 'antd';
+import { Button, Input, message } from 'antd';
 
 import { LatLngI, Map as MapInner, MapHandleI } from './components/Map';
 import { Menu, MenuItem, MenuItemOptionI } from './components/Menu';
@@ -35,7 +35,7 @@ export function Map() {
   const [wayPoints, setWayPointsForState] = useState<WayPointI[]>([]);
   const [routePoints, setRoutePointsForState] = useState<LatLngI[]>([]);
   const [routeDis, setRouteDis] = useState(0);
-  const [gpxContent, setGpxContent] = useState('');
+  // const [gpxContent, setGpxContent] = useState('');
 
   // FIXME:让callback回调里能拿到最新的wayPoints,而不是频繁的setMenuItems
   const wayPointsRef = useRef<WayPointI[]>([]);
@@ -138,7 +138,11 @@ export function Map() {
     setRouteDis(0);
   };
   const genGpx = async () => {
-    setGpxContent(await genGpxContent(routePointsRef.current));
+    // setGpxContent(await genGpxContent(routePointsRef.current));
+    const gpsContent = await genGpxContent(routePointsRef.current);
+    navigator.clipboard.writeText(gpsContent).then(() => {
+      message.success('已复制到粘贴板');
+    });
   };
 
   const [menuItems, setMenuItems] = useState<MenuItemI[]>(
@@ -151,14 +155,11 @@ export function Map() {
 
   return (
     <>
-      <MapInner
+      <StyledMap
         ref={mapCompRef}
         center={center}
         zoom={15}
-        style={{
-          width: '600px',
-          height: '600px',
-        }}
+        style={{ width: '100%', height: '100%' }}
       >
         <Menu>
           {menuItems.map((item) => (
@@ -209,13 +210,17 @@ export function Map() {
           />
         ))}
         {routePoints.length > 0 && <PolyLine latlngs={routePoints} />}
-      </MapInner>
-      <div>总距离: {(routeDis / 1000).toFixed(2)}km</div>
-      <Input.TextArea value={gpxContent} />
+      </StyledMap>
+      <StyledOverview>总距离: {(routeDis / 1000).toFixed(2)}km</StyledOverview>
+      {/* <Input.TextArea value={gpxContent} /> */}
     </>
   );
 }
 
+const StyledMap = styled(MapInner)`
+  width: 100%;
+  height: 100%;
+`;
 const StyledMarkerPopup = styled.div`
   padding: 0 20px 20px 20px;
 `;
@@ -226,6 +231,21 @@ const StyledMarkerName = styled.div`
 const StyledMarkerButtons = styled.div`
   display: flex;
   justify-content: center;
+`;
+const StyledOverview = styled.div`
+  position: fixed;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  padding: 5px 10px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #2d3033;
+  box-shadow: 0 1px 2.9px 0.1px rgba(0, 0, 0, 0.48);
 `;
 
 export default Map;
