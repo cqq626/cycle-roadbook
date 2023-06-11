@@ -1,73 +1,56 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
-import { Button } from 'antd';
+import { Button, Input } from 'antd';
 
 import { LatLngI, Map as MapInner, MapHandleI } from './components/Map';
 import { Menu, MenuItem, MenuItemOptionI } from './components/Menu';
 import { Marker } from './components/Marker';
 import { PolyLine } from './components/PolyLine';
+import {
+  genNewLatlng,
+  genRouteInfo,
+  genWayPoint,
+  genMenuItem,
+  genGpxContent,
+} from './utils';
 
-function genWayPoint(latlng: LatLngI): WayPointI {
-  return {
-    latlng,
-    pid: Math.random().toString(32).slice(2),
-  };
-}
-
-function genMenuItem(option: MenuItemOptionI): MenuItemI {
-  return {
-    option,
-    mid: Math.random().toString(32).slice(2),
-  };
-}
-
-interface WayPointI {
+export interface WayPointI {
   latlng: LatLngI;
   pid: string;
 }
 
-interface RouteSegI {
+export interface RouteSegI {
   latlngs: LatLngI[];
   dis: number;
 }
 
-interface MenuItemI {
+export interface MenuItemI {
   mid: string;
   option: MenuItemOptionI;
-}
-
-function genRouteInfo(routeSegs: RouteSegI[]) {
-  let routePoints: LatLngI[] = [];
-  let routeDis = 0;
-  for (const { dis, latlngs } of routeSegs) {
-    routeDis += dis;
-    routePoints = routePoints.concat(latlngs);
-  }
-  return { routeDis, routePoints };
-}
-
-function genNewLatlng({ lat, lng }: LatLngI) {
-  return {
-    lat: lat + 0.001,
-    lng: lng + 0.001,
-  };
 }
 
 export function Map() {
   console.log(`[trigger]MapWrapper`);
   const [center, setCenter] = useState<LatLngI>({ lat: 39.915, lng: 116.404 });
   const [wayPoints, setWayPointsForState] = useState<WayPointI[]>([]);
-  const [routePoints, setRoutePoints] = useState<LatLngI[]>([]);
+  const [routePoints, setRoutePointsForState] = useState<LatLngI[]>([]);
   const [routeDis, setRouteDis] = useState(0);
+  const [gpxContent, setGpxContent] = useState('');
 
   // FIXME:让callback回调里能拿到最新的wayPoints,而不是频繁的setMenuItems
   const wayPointsRef = useRef<WayPointI[]>([]);
   const routeSegsRef = useRef<RouteSegI[]>([]);
+  const routePointsRef = useRef<LatLngI[]>([]);
   const mapCompRef = useRef<MapHandleI>(null);
 
   const setWayPoints = (newWayPoints: WayPointI[]) => {
     setWayPointsForState(newWayPoints);
     wayPointsRef.current = newWayPoints;
+  };
+
+  const setRoutePoints = (newRoutePoints: LatLngI[]) => {
+    setRoutePointsForState(newRoutePoints);
+    routePointsRef.current = newRoutePoints;
   };
 
   const deleteRouteSegs = async (delWayPointIdx: number) => {
@@ -87,7 +70,6 @@ export function Map() {
     setRoutePoints(routePoints);
     setRouteDis(routeDis);
   };
-
   // startWayPointIdx 对应该 routeSeg 的 idx
   const addOrModifyRouteSegs = async (
     startWayPointIdx: number,
@@ -155,11 +137,15 @@ export function Map() {
     setRoutePoints([]);
     setRouteDis(0);
   };
+  const genGpx = async () => {
+    setGpxContent(await genGpxContent(routePointsRef.current));
+  };
 
   const [menuItems, setMenuItems] = useState<MenuItemI[]>(
     [
       { text: '创建途经点', callback: addPoint },
       { text: '清除地图', callback: clearMap },
+      { text: '生成GPX', callback: genGpx },
     ].map(genMenuItem)
   );
 
@@ -196,11 +182,7 @@ export function Map() {
             label={idx === 0 ? '起点' : `途经点${idx}`}
             popupComp={
               <StyledMarkerPopup>
-                <StyledMarkerName
-                  onClick={() => {
-                    console.log('fuck');
-                  }}
-                >
+                <StyledMarkerName>
                   {idx === 0 ? '起点' : `途经点${idx}`}
                 </StyledMarkerName>
                 <StyledMarkerButtons>
@@ -229,6 +211,7 @@ export function Map() {
         {routePoints.length > 0 && <PolyLine latlngs={routePoints} />}
       </MapInner>
       <div>总距离: {(routeDis / 1000).toFixed(2)}km</div>
+      <Input.TextArea value={gpxContent} />
     </>
   );
 }
