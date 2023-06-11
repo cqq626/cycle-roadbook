@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "nx serve roadbook"
+    "start": "nx serve roadbook",
+    "build": "nx build roadbook"
   },
   "private": true,
   "dependencies": {
