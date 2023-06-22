@@ -57,7 +57,7 @@ export const Marker = ({
         popupDomRef.current = popupDom;
         popup = new BMapGL.InfoWindow(popupDomRef.current, {
           offset: new BMapGL.Size(0, -25),
-          width: 220,
+          width: 300,
           height: 100,
         });
         popup.addEventListener('open', openPopupCb);

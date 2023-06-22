@@ -6,6 +6,7 @@ import { LatLngI, Map as MapInner, MapHandleI } from './components/Map';
 import { Menu, MenuItem, MenuItemOptionI } from './components/Menu';
 import { Marker } from './components/Marker';
 import { PolyLine } from './components/PolyLine';
+import { Circle } from './components/Circle';
 import {
   genNewLatlng,
   genRouteInfo,
@@ -35,6 +36,7 @@ export function Map() {
   const [wayPoints, setWayPointsForState] = useState<WayPointI[]>([]);
   const [routePoints, setRoutePointsForState] = useState<LatLngI[]>([]);
   const [routeDis, setRouteDis] = useState(0);
+  const [circleCenter, setCircleCenter] = useState<LatLngI | null>(null);
   // const [gpxContent, setGpxContent] = useState('');
 
   // FIXME:让callback回调里能拿到最新的wayPoints,而不是频繁的setMenuItems
@@ -144,6 +146,13 @@ export function Map() {
       message.success('已复制到粘贴板');
     });
   };
+  const toggleCircle = async (latlng?: LatLngI) => {
+    if (!latlng) {
+      setCircleCenter(null);
+    } else {
+      setCircleCenter(latlng);
+    }
+  };
 
   const [menuItems, setMenuItems] = useState<MenuItemI[]>(
     [
@@ -204,12 +213,25 @@ export function Map() {
                   <Button danger onClick={() => delPoint(idx)}>
                     删除
                   </Button>
+                  {idx === 0 &&
+                    (circleCenter ? (
+                      <Button danger onClick={() => toggleCircle()}>
+                        关闭测距圆
+                      </Button>
+                    ) : (
+                      <Button onClick={() => toggleCircle(latlng)}>
+                        打开测距圆
+                      </Button>
+                    ))}
                 </StyledMarkerButtons>
               </StyledMarkerPopup>
             }
           />
         ))}
         {routePoints.length > 0 && <PolyLine latlngs={routePoints} />}
+        {circleCenter && (
+          <Circle center={circleCenter} radius={5000} enableEditing={true} />
+        )}
       </StyledMap>
       <StyledOverview>总距离: {(routeDis / 1000).toFixed(2)}km</StyledOverview>
       {/* <Input.TextArea value={gpxContent} /> */}
@@ -247,5 +269,6 @@ const StyledOverview = styled.div`
   background: #2d3033;
   box-shadow: 0 1px 2.9px 0.1px rgba(0, 0, 0, 0.48);
 `;
+const StyledButtonsGroup = styled.div``;
 
 export default Map;
