@@ -9,7 +9,8 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "docs/"
+        "outputPath": "docs/",
+        "base": "cycle-roadbook"
       },
       "configurations": {
         "development": {
