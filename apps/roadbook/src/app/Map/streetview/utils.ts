@@ -2,7 +2,7 @@ import { request } from './request';
 import { LatLngI } from '../components/Map';
 
 function getUrl() {
-  return `http://mapsv${Math.round(Math.random())}.bdimg.com`;
+  return `https://mapsv${Math.round(Math.random())}.bdimg.com`;
 }
 
 interface SidResultI {
