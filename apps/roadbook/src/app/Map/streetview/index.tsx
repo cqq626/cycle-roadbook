@@ -44,12 +44,14 @@ export const Streetview = ({ mcLatLng }: StreetviewPropsI) => {
         {streetviewPics.length ? (
           streetviewPics.map((picGroup, picGroupIdx) => {
             const picComps = picGroup.map((pic, picIdx) => (
-              <StyledImgWrapper>
+              <StyledImgWrapper key={picIdx}>
                 {/* <StyledImgCode>{`${picGroupIdx}_${picIdx}`}</StyledImgCode> */}
                 <StyledImg src={pic} />
               </StyledImgWrapper>
             ));
-            return <StyledImgGroup>{picComps}</StyledImgGroup>;
+            return (
+              <StyledImgGroup key={picGroupIdx}>{picComps}</StyledImgGroup>
+            );
           })
         ) : (
           <StyledHint>此处无街景</StyledHint>
