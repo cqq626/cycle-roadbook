@@ -37,6 +37,7 @@ export interface RouteResI {
 
 export interface MapHandleI {
   getRoute: (startLatlng: LatLngI, endLatlng: LatLngI) => Promise<RouteResI>;
+  getMapInstance: () => any;
 }
 
 export const Map = forwardRef<MapHandleI, MapPropsI>((props, ref) => {
@@ -98,6 +99,9 @@ export const Map = forwardRef<MapHandleI, MapPropsI>((props, ref) => {
         });
         ridingRoute.search(startPoint, endPoint);
       });
+    },
+    getMapInstance: () => {
+      return compRef.current;
     },
   }));
 

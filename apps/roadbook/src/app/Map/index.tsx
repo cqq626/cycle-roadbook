@@ -7,6 +7,8 @@ import { Menu, MenuItem, MenuItemOptionI } from './components/Menu';
 import { Marker } from './components/Marker';
 import { PolyLine } from './components/PolyLine';
 import { Circle } from './components/Circle';
+import { getSid, getPics } from './streetview/utils';
+import { Streetview } from './streetview';
 import {
   genNewLatlng,
   genRouteInfo,
@@ -37,6 +39,9 @@ export function Map() {
   const [routePoints, setRoutePointsForState] = useState<LatLngI[]>([]);
   const [routeDis, setRouteDis] = useState(0);
   const [circleCenter, setCircleCenter] = useState<LatLngI | null>(null);
+  const [streetviewMcLatLng, setStreetviewMcLatLng] = useState<LatLngI | null>(
+    null
+  );
   // const [gpxContent, setGpxContent] = useState('');
 
   // FIXME:让callback回调里能拿到最新的wayPoints,而不是频繁的setMenuItems
@@ -153,10 +158,19 @@ export function Map() {
       setCircleCenter(latlng);
     }
   };
+  const loadStreetview = async (latlng: LatLngI) => {
+    if (!mapCompRef.current) {
+      return;
+    }
+    const map = mapCompRef.current.getMapInstance();
+    const [mcLng, mcLat] = map.lnglatToMercator(latlng.lng, latlng.lat);
+    setStreetviewMcLatLng({ lat: mcLat, lng: mcLng });
+  };
 
   const [menuItems, setMenuItems] = useState<MenuItemI[]>(
     [
       { text: '创建途经点', callback: addPoint },
+      { text: '查看街景', callback: loadStreetview },
       { text: '清除地图', callback: clearMap },
       { text: '生成GPX', callback: genGpx },
     ].map(genMenuItem)
@@ -183,7 +197,10 @@ export function Map() {
             enableDragging={true}
             onChange={async (newLatLng) => {
               const newWayPoints = [...wayPoints];
-              const targetWayPoint = { ...wayPoints[idx], latlng: newLatLng };
+              const targetWayPoint = {
+                ...wayPoints[idx],
+                latlng: newLatLng,
+              };
               newWayPoints.splice(idx, 1, targetWayPoint);
               setWayPoints(newWayPoints);
               await addOrModifyRouteSegs(idx, idx + 1, true);
@@ -234,7 +251,7 @@ export function Map() {
         )}
       </StyledMap>
       <StyledOverview>总距离: {(routeDis / 1000).toFixed(2)}km</StyledOverview>
-      {/* <Input.TextArea value={gpxContent} /> */}
+      <Streetview mcLatLng={streetviewMcLatLng} />
     </>
   );
 }
