@@ -37,6 +37,10 @@ export const Circle = ({
 
       compRef.current = circle;
       map.addOverlay(circle);
+      const circleLatlngs = circle.points
+        .map((point: any) => point.latLng)
+        .filter((val: any) => val);
+      map.setViewport(circleLatlngs);
     } else {
       circle.setCenter(centerPoint);
       circle.setRadius(radius);
