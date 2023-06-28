@@ -63,6 +63,10 @@ export const Map = forwardRef<MapHandleI, MapPropsI>((props, ref) => {
       map.addControl(scaleCtrl);
       const zoomCtrl = new BMapGL.ZoomControl();
       map.addControl(zoomCtrl);
+      const locateCtrl = new BMapGL.LocationControl({
+        anchor: (window as any).BMAP_ANCHOR_BOTTOM_LEFT,
+      });
+      map.addControl(locateCtrl);
 
       compRef.current = map;
       setContextState({ map, BMapGL });
