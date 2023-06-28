@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { Button, Input, message } from 'antd';
 import { debounce } from 'lodash-es';
 
+import packageJson from '../../../../../package.json';
 import { LatLngI, Map as MapInner, MapHandleI } from './components/Map';
 import { Menu, MenuItem, MenuItemOptionI } from './components/Menu';
 import { Marker } from './components/Marker';
@@ -191,11 +192,16 @@ export function Map() {
     console.log(`searchStr: ${searchStr}`);
     if (!searchRef.current) {
       searchRef.current = new (window as any).BMapGL.LocalSearch(map, {
-        renderOptions: { map: map },
+        renderOptions: { map: map, autoViewport: false },
+        onSearchComplete: (result: any) => {
+          if (result._pois.length === 0) {
+            message.warning('当前视图范围未搜索到数据');
+          }
+        },
       });
     }
     if (searchStr) {
-      searchRef.current.search(searchStr);
+      searchRef.current.searchInBounds(searchStr, map.getBounds());
     } else {
       searchRef.current.clearResults();
     }
@@ -278,6 +284,7 @@ export function Map() {
       <StyledSearchButton placeholder="搜索" allowClear onChange={onSearch} />
       <StyledOverview>总距离: {(routeDis / 1000).toFixed(2)}km</StyledOverview>
       <Streetview mcLatLng={streetviewMcLatLng} />
+      <StyledVersion>版本号:{packageJson.version}</StyledVersion>
     </>
   );
 }
@@ -317,6 +324,14 @@ const StyledSearchButton = styled(Input)`
   left: 10px;
   width: 200px;
   z-index: 9;
+`;
+const StyledVersion = styled.div`
+  position: fixed;
+  bottom: 5px;
+  left: 10px;
+  width: 200px;
+  z-index: 9;
+  font-size: 12px;
 `;
 
 export default Map;

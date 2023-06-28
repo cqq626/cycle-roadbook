@@ -70,6 +70,7 @@ export const Map = forwardRef<MapHandleI, MapPropsI>((props, ref) => {
       map.addControl(locateCtrl);
 
       compRef.current = map;
+      (window as any).debugMap = map;
       setContextState({ map, BMapGL });
       ridingRouteRef.current = new BMapGL.RidingRoute(map);
     }
