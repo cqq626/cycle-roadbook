@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { Button, Input, message } from 'antd';
+import { debounce } from 'lodash-es';
 
 import { LatLngI, Map as MapInner, MapHandleI } from './components/Map';
 import { Menu, MenuItem, MenuItemOptionI } from './components/Menu';
@@ -49,6 +50,7 @@ export function Map() {
   const routeSegsRef = useRef<RouteSegI[]>([]);
   const routePointsRef = useRef<LatLngI[]>([]);
   const mapCompRef = useRef<MapHandleI>(null);
+  const searchRef = useRef<any>(null);
 
   const setWayPoints = (newWayPoints: WayPointI[]) => {
     setWayPointsForState(newWayPoints);
@@ -176,13 +178,36 @@ export function Map() {
     ].map(genMenuItem)
   );
 
+  const onSearch = debounce((e: any) => {
+    if (!mapCompRef.current) {
+      return;
+    }
+    const map = mapCompRef.current.getMapInstance();
+    const searchStr = e.target.value;
+    // FIXME: 输入法编辑未完成也会触发,这里过滤一下
+    if (searchStr.includes(`'`)) {
+      return;
+    }
+    console.log(`searchStr: ${searchStr}`);
+    if (!searchRef.current) {
+      searchRef.current = new (window as any).BMapGL.LocalSearch(map, {
+        renderOptions: { map: map },
+      });
+    }
+    if (searchStr) {
+      searchRef.current.search(searchStr);
+    } else {
+      searchRef.current.clearResults();
+    }
+  }, 500);
+
   return (
     <>
       <StyledMap
         ref={mapCompRef}
         center={center}
         zoom={15}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: '100%', height: '100%', zIndex: '1' }}
       >
         <Menu>
           {menuItems.map((item) => (
@@ -250,16 +275,15 @@ export function Map() {
           <Circle center={circleCenter} radius={5000} enableEditing={true} />
         )}
       </StyledMap>
+      <StyledSearchButton placeholder="搜索" allowClear onChange={onSearch} />
       <StyledOverview>总距离: {(routeDis / 1000).toFixed(2)}km</StyledOverview>
       <Streetview mcLatLng={streetviewMcLatLng} />
     </>
   );
 }
 
-const StyledMap = styled(MapInner)`
-  width: 100%;
-  height: 100%;
-`;
+// FIXME: StyledMap的样式没生效
+const StyledMap = styled(MapInner)``;
 const StyledMarkerPopup = styled.div`
   padding: 0 20px 20px 20px;
 `;
@@ -274,8 +298,8 @@ const StyledMarkerButtons = styled.div`
 const StyledOverview = styled.div`
   position: fixed;
   top: 5px;
-  left: 5px;
-  right: 5px;
+  left: 300px;
+  right: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -285,7 +309,14 @@ const StyledOverview = styled.div`
   border-radius: 2px;
   background: #2d3033;
   box-shadow: 0 1px 2.9px 0.1px rgba(0, 0, 0, 0.48);
+  z-index: 9;
 `;
-const StyledButtonsGroup = styled.div``;
+const StyledSearchButton = styled(Input)`
+  position: fixed;
+  top: 5px;
+  left: 10px;
+  width: 200px;
+  z-index: 9;
+`;
 
 export default Map;

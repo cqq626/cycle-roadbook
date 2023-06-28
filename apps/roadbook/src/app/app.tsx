@@ -4,6 +4,7 @@ import 'antd/dist/reset.css';
 import { Map } from './Map';
 
 const StyledApp = styled.div`
+  position: relative;
   width: 100%;
   height: 100%;
 `;

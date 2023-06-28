@@ -64,7 +64,8 @@ export const Map = forwardRef<MapHandleI, MapPropsI>((props, ref) => {
       const zoomCtrl = new BMapGL.ZoomControl();
       map.addControl(zoomCtrl);
       const locateCtrl = new BMapGL.LocationControl({
-        anchor: (window as any).BMAP_ANCHOR_BOTTOM_LEFT,
+        anchor: (window as any).BMAP_ANCHOR_TOP_RIGHT,
+        offset: new BMapGL.Size(10, 10),
       });
       map.addControl(locateCtrl);
 
