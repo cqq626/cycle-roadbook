@@ -4,6 +4,8 @@
 
 ### 获取视图内的赛段
 
+有登录态校验
+
 ```
 https://www.strava.com/segments/explore/search?bounds=40.1573%2C116.2815%2C40.3146%2C116.6097&zoom=12&min_cat=0&max_cat=5&activity_type=Ride&_=1688041634057
 ```
@@ -33,7 +35,7 @@ https://www.strava.com/segments/explore/details?ids=30409229%2C15183773
 
 ### 获取视图内的赛段
 
-接口返回的是二进制瓦片数据
+接口返回的是二进制瓦片数据，有登录态校验
 
 - [ ] 二进制解析方式和取数逻辑
 - [ ] 坐标参数
