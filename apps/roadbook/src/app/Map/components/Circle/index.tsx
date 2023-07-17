@@ -33,6 +33,7 @@ export const Circle = ({
         strokeColor: 'blue',
         strokeWeight: 2,
         strokeOpacity: 0.5,
+        fillOpacity: 0.2,
       });
 
       compRef.current = circle;
