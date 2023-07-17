@@ -55,7 +55,7 @@ export function Map() {
 
   const setWayPoints = (newWayPoints: WayPointI[]) => {
     setWayPointsForState(newWayPoints);
-    wayPointsRef.current = newWayPoints;
+    wayPointsRef.current = [...newWayPoints];
   };
 
   const setRoutePoints = (newRoutePoints: LatLngI[]) => {
@@ -122,7 +122,7 @@ export function Map() {
     }
     wayPointsRef.current.splice(targetIdx, 0, midPoint);
     const newWayPoints = wayPointsRef.current;
-    setWayPoints(newWayPoints);
+    setWayPoints([...newWayPoints]);
     if (targetIdx === 0) {
       // 插在头部
       addOrModifyRouteSegs(targetIdx, targetIdx + 1);
@@ -137,7 +137,7 @@ export function Map() {
   };
   const delPoint = async (idx: number) => {
     wayPointsRef.current.splice(idx, 1);
-    setWayPoints(wayPointsRef.current);
+    setWayPoints([...wayPointsRef.current]);
     deleteRouteSegs(idx);
   };
   const clearMap = () => {
