@@ -4,6 +4,15 @@
 
 基于百度地图，打点生成骑行路线，将路线导出为 gpx 文件内容
 
+## 演示
+
+| 功能                            | 图示                                                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 右键菜单+打点生成路线           | ![右键菜单+打点生成路线](https://raw.githubusercontent.com/cqq626/cycle-roadbook/main/help/feature1.png)           |
+| 插入途经点+生成测距圆(仅限起点) | ![插入途经点+生成测距圆(仅限起点)](https://raw.githubusercontent.com/cqq626/cycle-roadbook/main/help/feature2.png) |
+| 地点搜索                        | ![地点搜索](https://raw.githubusercontent.com/cqq626/cycle-roadbook/main/help/feature3.png)                        |
+| 右键菜单查看街景                | ![右键菜单查看街景](https://raw.githubusercontent.com/cqq626/cycle-roadbook/main/help/feature4.png)                |
+
 ## 功能
 
 - [x] 右键打点生成骑行路线
